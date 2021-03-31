@@ -43,7 +43,8 @@ def find_k_means(X, K, max_iters=10):
         else:
             previous_centroids = centroids
     return centroids, idx
-
+def compute_mse(X, X_reconstructed):
+    return np.sum((X-X_reconstructed)**2) / len(X) 
 try:
     image_path = sys.argv[1]
     assert os.path.isfile(image_path)
@@ -58,12 +59,12 @@ upload_file = st.file_uploader('Choose image')
 if upload_file is not None:
     image_byte = upload_file.read()
     image = Image.open(io.BytesIO(image_byte))
-    st.image(image)
+    #st.image(image)
     image = np.asarray(image)/255
     w, h, d = image.shape
 
     st.write('Compressing...')
-    print('Image found with width: {}, height: {}, depth: {}'.format(w, h, d))
+    #print('Image found with width: {}, height: {}, deptSh: {}'.format(w, h, d))
 
     tic = time.time()
 
@@ -80,7 +81,10 @@ if upload_file is not None:
     
     toc = time.time()
     st.write('Done! Time taken: ', toc-tic)
-
     st.image([image,compressed_image])
+
+    st.write('Compute MSE...')
+    mse = compute_mse(X, X_reconstructed.reshape((w*h,d)))
+    st.write('MSE=', mse)
     #st.image(compressed_image)
     compressed_image.save('out.png')
